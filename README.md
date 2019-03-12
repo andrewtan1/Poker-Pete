@@ -13,6 +13,7 @@ Poker Pete is an intelligent card-playing AI made to detect cards and play the o
 
 ### Required Hardware
 
+- PC/Laptop
 - Texas Instruments LCDK
 - USB Camera
 - Green Table Mat
@@ -20,11 +21,12 @@ Poker Pete is an intelligent card-playing AI made to detect cards and play the o
 
 ## Development Plan
 
-1) Using the included python script(s) w/ the appropriate packages, we will generate the Neural Network constants for further development on the LCDK.
+1) Using the included python script(s) w/ the appropriate packages, we will generate the Neural Network constants on a PC for further development on the LCDK.
 2) The Neural Network can now be implemented at the interrupt level using a more elaborate version of the method that was used in Mini-Project 2.
 3) After finishing development on the LCDK, we implement the rules of various card games.
 4) Next, we implement the logic for choosing the best moves for each game using the concept of game theory for each of the games we choose to develop.
-5) To use the AI, select which game is to be played and the number of opposing players. Poker Pete should be able to determine the best moves from here on out.
+5) To use the AI, select which game is to be played and the number of opposing players. Poker Pete should be able to determine the best moves from here on out. 
+6) We will most likely attempt to use the Code Composer GUI to create the interface for interacting with the AI and visualizing its decision making process in the live video feed.
 
 ## References/Sources
 
