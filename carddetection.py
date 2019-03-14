@@ -5,7 +5,6 @@ import numpy as np
 import argparse
 import cv2
 import imutils
-<<<<<<< HEAD
  
 # Test load img in grayscale
 image = cv2.imread('img/cards-[C0]-001.jpg')
