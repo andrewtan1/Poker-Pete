@@ -10,7 +10,7 @@ Poker Pete is an intelligent card-playing AI made to detect cards and play the o
 - Python 3.7.2
 - OpenCV 4.0.0.21
 - imaug 0.2.8
-- OMAPL138 Libraries
+- PyQT5 v5.9.2
 
 ### Required Hardware
 
