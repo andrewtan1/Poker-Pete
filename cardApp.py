@@ -1,9 +1,12 @@
 #from darkflow.net.build import TFNet
 
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
+from PyQt5 import QtWidgets
+from PyQt5 import QtGui
 import matplotlib.pyplot as plt
 import cv2
 import os
+from os import path
 import numpy as np
 import sys
 import logging as log
@@ -75,17 +78,40 @@ results = [
 # Iterate through list of dictionaries
 extension="png"
 card_dir="card_imgs"
-
-for i in range(results):
+'''
+itCnt = 0
+#If detected 5 out of the last 10 fromes, detected.
+confidence = 0
+detDict = {}
+cardList = [d['label'] for d in results]
+confList = [d['confidence'] for d in results]
+'''for i in range(results):
     for key,val in results[i].items():
         if key == 'label':
             card_name = val
-            img_dir = os.path.join(card_dir,card_name+"."+extension)
-            
+            #img_dir = os.path.join(card_dir,card_name+"."+extension)
+        if key == 'confidence' and val>=0.01:
+            confidence = val*10
+            detDict[card_name] = confidence #out of 100
+'''
+ccDict = dict(zip(cardList,confList)) #create dictionary of cards
+ccDict_fixed = {card:conf for card,conf in ccDict.items() if conf>=0.1}
+for card,conf in ccDict_fixed.items():
+    ccDict_fixed[card] *= 10
+'''Debugging
+for k,v in ccDict.items():
+    print(k,v)
+for k,v in ccDict_fixed.items():
+    print(k,v)
+print(*cardList)
+print(*confList)
+'''
+
+
 
 
 # If card detected 5 times out of 10 frames, output as 
-'''
+
 '''
 _, ax = plt.subplots(figsize=(20, 10))
 plt.imshow(boxing(original_img, results, threshold))
