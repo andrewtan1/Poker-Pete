@@ -96,7 +96,7 @@ window.setGeometry(0,0,400,200)
 layout = QVBoxLayout()
 #Display Image
 pic = QtWidgets.QLabel(window)
-pic.setGeometry(10, 10, 400, 100)
+pic.setGeometry(10, 10, 238, 333) #TODO: Change geometry to be size of resized image
 pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/card_imgs/10C.png"))
 
 '''
