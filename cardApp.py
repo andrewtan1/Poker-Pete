@@ -1,7 +1,7 @@
 #from darkflow.net.build import TFNet
 
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QProgressBar, QHBoxLayout, QDialog
-from PyQt5 import QtGui
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout, QProgressBar, QGridLayout, QDialog, QGroupBox
+from PyQt5.QtGui import QIcon
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 import matplotlib.pyplot as plt
@@ -22,53 +22,7 @@ class recordVideo:
             self.running = True
             while self.running:
                 read, frame = self.camera.read()
-
-class Example(QWidget):
-    
-    def __init__(self):
-        super().__init__()
-        
-        self.initUI()
-        
-        
-    def initUI(self):      
-
-        self.pbar = QProgressBar(self)
-        self.pbar.setGeometry(30, 40, 200, 25)
-
-        self.btn = QPushButton('Start', self)
-        self.btn.move(40, 80)
-        self.btn.clicked.connect(self.doAction)
-
-        self.timer = QBasicTimer()
-        self.step = 0
-        
-        self.setGeometry(300, 300, 280, 170)
-        self.setWindowTitle('QProgressBar')
-        self.show()
-        
-        
-    def timerEvent(self, e):
-      
-        if self.step >= 100:
-            
-            self.timer.stop()
-            self.btn.setText('Finished')
-            return
-            
-        self.step = self.step + 1
-        self.pbar.setValue(self.step)
-        
-
-    def doAction(self):
-      
-        if self.timer.isActive():
-            self.timer.stop()
-            self.btn.setText('Start')
-        else:
-            self.timer.start(100, self)
-            self.btn.setText('Stop')
-            
+           
 class Dialog(QDialog):
     def __init__(self, parent=None):
         super(Dialog, self).__init__(parent)
@@ -90,14 +44,6 @@ class Dialog(QDialog):
         self.resize(200, 50)
         self.show()        
 
-app = QApplication(sys.argv)
-window = QtWidgets.QMainWindow()
-window.setGeometry(0,0,400,200)
-layout = QVBoxLayout()
-#Display Image
-pic = QtWidgets.QLabel(window)
-pic.setGeometry(10, 10, 238, 333) #TODO: Change geometry to be size of resized image
-pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/card_imgs/10C.png"))
 
 '''
 options = {"model": "cfg/yolo-52c.cfg", 
@@ -169,7 +115,12 @@ for card,conf in ccDict_fixed.items():
     # append card img to each key
     #ccDict_fixed[card].
 sorted_ccDict = sorted(ccDict_fixed.items(), key=operator.itemgetter(1), reverse=True)
-
+'''
+#Display Image
+pic = QtWidgets.QLabel(window)
+pic.setGeometry(10, 10, 238, 333) #TODO: Change geometry to be size of resized image
+pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/card_imgs/10C.png"))
+'''
 # Iterate through list of dictionaries
 extension="png"
 card_dir="card_imgs"
@@ -182,6 +133,58 @@ for k,v in sorted_ccDict:
     img_list.append(img_new)
     #In one line, img_dir left and number (progressbar) on right
     #Complete vertically for all in sorted_ccDict
+class App(QDialog):
+
+    def __init__(self):
+        super().__init__()
+        self.title = 'PyQt5 layout - pythonspot.com'
+        self.left = 200
+        self.top = 200
+        self.width = 320
+        self.height = 100
+        self.initUI()
+        
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+        
+        self.createGridLayout()
+        
+        windowLayout = QVBoxLayout()
+        windowLayout.addWidget(self.horizontalGroupBox)
+        self.setLayout(windowLayout)
+        
+        self.show()
+    
+    def createGridLayout(self):
+        self.horizontalGroupBox = QGroupBox("Grid")
+        layout = QGridLayout()
+        layout.setColumnStretch(1, 7)
+        
+        layout.addWidget(QPushButton('1'),0,0)
+        layout.addWidget(QPushButton('2'),0,1)
+        layout.addWidget(QPushButton('4'),1,0)
+        layout.addWidget(QPushButton('5'),1,1)
+        layout.addWidget(QPushButton('7'),2,0)
+        layout.addWidget(QPushButton('8'),2,1)
+        
+        self.horizontalGroupBox.setLayout(layout)
+
+class QProgBar(QProgressBar):
+    value = 0
+
+    @pyqtSlot() #declares increasevalue void
+    def increaseValue(progressBar):
+        progressBar.setValue(progressBar.value)
+        progressBar.value = progressBar.value+1
+
+'''app = QApplication(sys.argv)
+window = QtWidgets.QMainWindow()
+window.setGeometry(0,0,400,200)
+layout = QGridLayout()
+'''
+
+
 '''QProgressBar *proBar = new QProgressBar
     proBar.set
     layout.addWidget(QProgressBar(ccDict_fixed[card]))'''
@@ -205,12 +208,12 @@ print(sorted_ccDict)
 _, ax = plt.subplots(figsize=(20, 10))
 plt.imshow(boxing(original_img, results, threshold))
 '''
-
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = App()
+    sys.exit(app.exec_())
+'''
 window.setLayout(layout)
 window.show()
 app.exec_()
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = Example()
-    sys.exit(app.exec_())
+'''
