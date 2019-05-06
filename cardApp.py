@@ -1,8 +1,9 @@
 #from darkflow.net.build import TFNet
 
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QProgressBar, QHBoxLayout, QVBoxLayout
-from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QProgressBar, QHBoxLayout, QDialog
 from PyQt5 import QtGui
+from PyQt5 import QtCore
+from PyQt5 import QtWidgets
 import matplotlib.pyplot as plt
 import cv2
 import os
@@ -68,27 +69,35 @@ class Example(QWidget):
             self.timer.start(100, self)
             self.btn.setText('Stop')
             
-        
+class Dialog(QDialog):
+    def __init__(self, parent=None):
+        super(Dialog, self).__init__(parent)
+        self.setLayout(QVBoxLayout())
+        h_layout = QHBoxLayout()
+        self.layout().addLayout(h_layout)
+        label = QLabel(self)
+        label.setText('Card')
 
+        bar = QProgressBar(self)
+        policy = bar.sizePolicy()
+        policy.setHorizontalPolicy(QSizePolicy.Expanding)
+        bar.setSizePolicy(policy)
 
-'''class displayConf(QtGui.QMainWindow):
-    def _init_(self):
-        super(displayConf, self)._init_()
-        #create label
-        self.progressLabel = QLabel()
-        #create bar
-        self.progressBar = QProgressBar(self)
-        self.progressBar.setMaximum(100)
-        self.progressBar.setMinimum(0)
-        #horizontal label and value
-        self.hboxLayout = QHBoxLayout(self)
-        #add widgets
-        self.hboxLayout.addWidget(self.progressLabel)
-        self.hboxLayout.addWidget(self.progressBar)
-'''
-app = QApplication([])
-window = QWidget()
+        h_layout.addWidget(label)
+        h_layout.addWidget(bar)
+        button = QPushButton('Ok')
+        self.layout().addWidget(button)
+        self.resize(200, 50)
+        self.show()        
+
+app = QApplication(sys.argv)
+window = QtWidgets.QMainWindow()
+window.setGeometry(0,0,400,200)
 layout = QVBoxLayout()
+#Display Image
+pic = QtWidgets.QLabel(window)
+pic.setGeometry(10, 10, 400, 100)
+pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/card_imgs/10C.png"))
 
 '''
 options = {"model": "cfg/yolo-52c.cfg", 
@@ -164,9 +173,13 @@ sorted_ccDict = sorted(ccDict_fixed.items(), key=operator.itemgetter(1), reverse
 # Iterate through list of dictionaries
 extension="png"
 card_dir="card_imgs"
-
+img_list = []
 for k,v in sorted_ccDict:
     img_dir = os.path.join(card_dir,k+"."+extension)
+    img = cv2.imread(img_dir)
+    _, height, width = img.shape
+    img_new = cv2.resize(img,dsize=(int(height*100/238), int(width*100/238)),interpolation=cv2.INTER_CUBIC)
+    img_list.append(img_new)
     #In one line, img_dir left and number (progressbar) on right
     #Complete vertically for all in sorted_ccDict
 '''QProgressBar *proBar = new QProgressBar
