@@ -114,7 +114,7 @@ for card,conf in ccDict_fixed.items():
     ccDict_fixed[card] = newConf
     # append card img to each key
     #ccDict_fixed[card].
-sorted_ccDict = sorted(ccDict_fixed.items(), key=operator.itemgetter(1), reverse=True)
+sorted_cc = sorted(ccDict_fixed.items(), key=operator.itemgetter(1), reverse=True)
 '''
 #Display Image
 pic = QtWidgets.QLabel(window)
@@ -122,32 +122,53 @@ pic.setGeometry(10, 10, 238, 333) #TODO: Change geometry to be size of resized i
 pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/card_imgs/10C.png"))
 '''
 # Iterate through list of dictionaries
-extension="png"
+'''extension="png"
 card_dir="card_imgs"
 img_list = []
-for k,v in sorted_ccDict:
+for k,v in sorted_cc:
     img_dir = os.path.join(card_dir,k+"."+extension)
+    print(img_dir)
     img = cv2.imread(img_dir)
     _, height, width = img.shape
     img_new = cv2.resize(img,dsize=(int(height*100/238), int(width*100/238)),interpolation=cv2.INTER_CUBIC)
     img_list.append(img_new)
     #In one line, img_dir left and number (progressbar) on right
-    #Complete vertically for all in sorted_ccDict
+    #Complete vertically for all in sorted_ccDict'''
+class cardConf(QtCore.QRunnable):
+
+    def _init_(self,card,conf):
+        super(cardConf, self)._init_()
+        self.card = card
+        self.conf = conf
+        self.card_dir = "card_imgs"
+        self.extension = "png"
+
+    def cardBar(self):
+        # Image Representation of Card
+        img_dir = os.path.join(card_dir,card+"."+extension)
+        imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
+        imgPixScaled = imgPix.scaledToWidth(100)
+        # Create Progress Bar
+        bar = QtGui.QProgressBar()
+        bar.setValue(conf)
+
+
 class App(QDialog):
 
-    def __init__(self):
+    def __init__(self, list):
         super().__init__()
-        self.title = 'PyQt5 layout - pythonspot.com'
+        self.title = 'Card-Confidence Display'
         self.left = 200
         self.top = 200
-        self.width = 320
-        self.height = 100
+        self.width = 500
+        self.height = 500
         self.initUI()
         
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        
+        self.bar = QProgressBar(self)
+
         self.createGridLayout()
         
         windowLayout = QVBoxLayout()
@@ -170,14 +191,6 @@ class App(QDialog):
         
         self.horizontalGroupBox.setLayout(layout)
 
-class QProgBar(QProgressBar):
-    value = 0
-
-    @pyqtSlot() #declares increasevalue void
-    def increaseValue(progressBar):
-        progressBar.setValue(progressBar.value)
-        progressBar.value = progressBar.value+1
-
 '''app = QApplication(sys.argv)
 window = QtWidgets.QMainWindow()
 window.setGeometry(0,0,400,200)
@@ -197,7 +210,8 @@ layout = QGridLayout()
 #print(*confList)
 #print(results)
 print(ccDict_fixed)
-print(sorted_ccDict)
+print(sorted_cc[1])
+
 
 
 
@@ -210,7 +224,7 @@ plt.imshow(boxing(original_img, results, threshold))
 '''
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = App()
+    ex = App(sorted_cc)
     sys.exit(app.exec_())
 '''
 window.setLayout(layout)
