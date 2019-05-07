@@ -9,6 +9,7 @@ Poker Pete is an intelligent card-playing AI made to detect cards and play the o
 - Conda 4.6.7
 - Python 3.7.2
 - OpenCV 4.0.0.21
+- imaug 0.2.8
 - OMAPL138 Libraries
 
 ### Required Hardware
@@ -16,7 +17,7 @@ Poker Pete is an intelligent card-playing AI made to detect cards and play the o
 - PC/Laptop
 - Texas Instruments LCDK
 - USB Camera
-- Green Table Mat
+- Green Table Mat (optional)
 - Pack of 52 Playing Cards
 
 ## Development Plan
@@ -30,4 +31,4 @@ Poker Pete is an intelligent card-playing AI made to detect cards and play the o
 
 ## References/Sources
 
-Training Set Repository (Thanks to lordloh): [link](https://github.com/lordloh/playing-cards)
+Bicycle Card Scans: [link](https://sourceforge.net/projects/vector-cards/)
