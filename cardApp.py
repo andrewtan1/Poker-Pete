@@ -165,7 +165,7 @@ class cardConf(QWidget):
     def cardBar(self):
         for ind in range(numCard):
             bar = QtGui.QProgressBar(self)
-            bar.setGeometry(200,80,250,20)
+            bar.setGeometry(10,10,500,70)
             # Create Progress Bar
             bar.setValue(confList[ind])
             lay.addWidget(bar)
@@ -197,7 +197,8 @@ class App(QDialog):
         self.horizontalGroupBox = QGroupBox("Cards-Confidence List")
         layout = QGridLayout()
         layout.setColumnStretch(1, 7)
-        cardNames = [cList[0] for cList in cardList]
+        cardList = [item[0] for item in sorted_cc]
+        #layout.addWidget(QtWidgets.QLabel(cardList[0]),0,0) #Debugging
         layout.addWidget(cardImg(),0,0)
         layout.addWidget(cardConf(),0,1)
         '''pic = QtWidgets.QLabel(self)
