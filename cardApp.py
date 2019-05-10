@@ -24,28 +24,6 @@ class recordVideo:
             while self.running:
                 read, frame = self.camera.read()
            
-class Dialog(QDialog):
-    def __init__(self, parent=None):
-        super(Dialog, self).__init__(parent)
-        self.setLayout(QVBoxLayout())
-        h_layout = QHBoxLayout()
-        self.layout().addLayout(h_layout)
-        label = QLabel(self)
-        label.setText('Card')
-
-        bar = QProgressBar(self)
-        policy = bar.sizePolicy()
-        policy.setHorizontalPolicy(QSizePolicy.Expanding)
-        bar.setSizePolicy(policy)
-
-        h_layout.addWidget(label)
-        h_layout.addWidget(bar)
-        button = QPushButton('Ok')
-        self.layout().addWidget(button)
-        self.resize(200, 50)
-        self.show()        
-
-
 '''
 options = {"model": "cfg/yolo-52c.cfg", 
            "load": -1, 
@@ -105,16 +83,17 @@ itCnt = 0
 #If detected 5 out of the last 10 fromes, detected.
 confidence = 0
 detDict = {}
+
+# Grab Detected Cards w/ their Confidences
 cardList = [d['label'] for d in results]
 confList = [d['confidence'] for d in results]
 
+# Sort the Detected Cards w/ their Confidences
 ccDict = dict(zip(cardList,confList)) #create dictionary of cards
 ccDict_fixed = {card:conf for card,conf in ccDict.items() if conf>=0.1} #only take values of acceptable confidence
 for card,conf in ccDict_fixed.items():
     newConf = float("{0:.1f}".format(ccDict_fixed[card]*100))
     ccDict_fixed[card] = newConf
-    # append card img to each key
-    #ccDict_fixed[card].
 sorted_cc = sorted(ccDict_fixed.items(), key=operator.itemgetter(1), reverse=True)
 
 class App(QDialog):
