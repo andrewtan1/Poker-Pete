@@ -124,44 +124,53 @@ pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/card_imgs/10C.png"))
 '''
 
 class cardImg(QWidget):
-
     def _init_(self):
         super(cardImg, self)._init_()
-        #self.window = QtWidgets.QMainWindow()
         card_dir = "card_imgs"
         extension = "png"
-        cardList = sorted_cc
+        cardList = [item[0] for item in sorted_cc]
         numCard = len(cardList)
         lay = QVBoxLayout(self)
-        self.cardBar()
+        self.imgList()
 
-    def cardBar(self):
+    def imgList(self):
         # Image Representation of Card
+        '''#TODO: DEBUG TEST
+        pic = QtWidgets.QLabel(self)
+        img_dir = os.path.join("card_imgs","9S"+"."+"png")
+        imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
+        imgScaled = imgPix.scaledToHeight(70)
+        pic.setPixmap(imgScaled)
+        self.resize(imgScaled.width(),imgScaled.height())
+        lay.addWidget(pic)
+        ## END TEST'''
         for ind in range(numCard):
             pic = QtWidgets.QLabel(self)
             #pic.setGeometry(10, 10, 71, 100) 
             img_dir = os.path.join(card_dir,cardList[ind]+"."+extension)
             imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
-            imgPixScaled = imgPix.scaledToHeight(100)
+            imgPixScaled = imgPix.scaledToHeight(70)
             pic.setPixmap(imgPixScaled)
             self.resize(imgPixScaled.width(),imgPixScaled.height())
             lay.addWidget(pic)
 
 class cardConf(QWidget):
-
-    def _init_(self,*conf):
+    def _init_(self):
         super(cardConf, self)._init_()
-        self.card = card
-        self.conf = conf
-        self.bar = QtGui.QProgressBar(self)
-        self.bar.setGeometry(200,80,250,20)
+        confList = [item[1] for item in sorted_cc]
+        numCard = len(confList)
+        lay = QVBoxLayout(self)
+        self.cardBar()
 
     def cardBar(self):
-        # Create Progress Bar
-        bar.setValue(conf)
+        for ind in range(numCard):
+            bar = QtGui.QProgressBar(self)
+            bar.setGeometry(200,80,250,20)
+            # Create Progress Bar
+            bar.setValue(confList[ind])
+            lay.addWidget(bar)
 
 class App(QDialog):
-
     def __init__(self):
         super(App, self).__init__()
         self.title = 'Poker Pete Visualization'
@@ -169,7 +178,7 @@ class App(QDialog):
         self.top = 200
         self.width = 500
         self.height = 500
-        self.window = QtWidgets.QMainWindow()
+        #self.window = QtWidgets.QMainWindow()
         self.initUI()
         
     def initUI(self):
@@ -189,7 +198,16 @@ class App(QDialog):
         layout = QGridLayout()
         layout.setColumnStretch(1, 7)
         cardNames = [cList[0] for cList in cardList]
-        layout.addWidget(cardImg())
+        layout.addWidget(cardImg(),0,0)
+        layout.addWidget(cardConf(),0,1)
+        '''pic = QtWidgets.QLabel(self)
+        #pic.setGeometry(10, 10, 71, 100) 
+        img_dir = os.path.join('card_imgs','9S'+"."+extension)
+        imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
+        imgPixScaled = imgPix.scaledToHeight(70)
+        pic.setPixmap(imgPixScaled)
+        self.resize(imgPixScaled.width(),imgPixScaled.height())
+        lay.addWidget(pic)'''
         '''for item in range(self.numItems):
             card = self.card_list[item]
             imgArg = {"cardNum": card[0], "window":self.window}
