@@ -58,7 +58,7 @@ load_img = cv2.imread('sample_img/sample_cards7.jpg')
 original_img = cv2.cvtColor(load_img, cv2.COLOR_BGR2RGB)
 results = tfnet.return_predict(original_img)
 '''
-# Example Results Output
+# Example Results Output - TODO: Replace with continuous input
 results = [
    {'label': 'AC', 'confidence': 0.21588273, 'topleft': {'x': 89, 'y': 273}, 'bottomright': {'x': 152, 'y': 408}}, 
    {'label': '4C', 'confidence': 0.007568298, 'topleft': {'x': 187, 'y': 200}, 'bottomright': {'x': 233, 'y': 288}}, 
@@ -84,13 +84,16 @@ itCnt = 0
 confidence = 0
 detDict = {}
 
+# Declare Confidence Threshold for Display
+thresh = 0.1
+
 # Grab Detected Cards w/ their Confidences
 cardList = [d['label'] for d in results]
 confList = [d['confidence'] for d in results]
 
 # Sort the Detected Cards w/ their Confidences
 ccDict = dict(zip(cardList,confList)) #create dictionary of cards
-ccDict_fixed = {card:conf for card,conf in ccDict.items() if conf>=0.1} #only take values of acceptable confidence
+ccDict_fixed = {card:conf for card,conf in ccDict.items() if conf>=thresh} #only take values of acceptable confidence
 for card,conf in ccDict_fixed.items():
     newConf = float("{0:.1f}".format(ccDict_fixed[card]*100))
     ccDict_fixed[card] = newConf
@@ -100,11 +103,11 @@ class App(QDialog):
     def __init__(self):
         super(App, self).__init__()
         self.title = 'Poker Pete Visualization'
+        # Set Window Location/Dimensions At Startup
         self.left = 200
         self.top = 200
         self.width = 500
         self.height = 500
-        #self.window = QtWidgets.QMainWindow()
         self.initUI()
         
     def initUI(self):
