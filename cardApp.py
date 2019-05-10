@@ -121,37 +121,36 @@ pic = QtWidgets.QLabel(window)
 pic.setGeometry(10, 10, 238, 333) #TODO: Change geometry to be size of resized image
 pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/card_imgs/10C.png"))
 '''
-# Iterate through list of dictionaries
-'''extension="png"
-card_dir="card_imgs"
-img_list = []
-for k,v in sorted_cc:
-    img_dir = os.path.join(card_dir,k+"."+extension)
-    print(img_dir)
-    img = cv2.imread(img_dir)
-    _, height, width = img.shape
-    img_new = cv2.resize(img,dsize=(int(height*100/238), int(width*100/238)),interpolation=cv2.INTER_CUBIC)
-    img_list.append(img_new)
-    #In one line, img_dir left and number (progressbar) on right
-    #Complete vertically for all in sorted_ccDict'''
-class cardConf(QtCore.QRunnable):
 
-    def _init_(self,card,conf):
-        super(cardConf, self)._init_()
+class cardImg(QtCore.QRunnable):
+
+    def _init_(self,card,window):
+        super(cardImg, self)._init_()
         self.card = card
-        self.conf = conf
+        self.window = window
         self.card_dir = "card_imgs"
         self.extension = "png"
 
     def cardBar(self):
         # Image Representation of Card
+        pic = QtWidgets.QLabel(window)
         img_dir = os.path.join(card_dir,card+"."+extension)
         imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
-        imgPixScaled = imgPix.scaledToWidth(100)
-        # Create Progress Bar
-        bar = QtGui.QProgressBar()
-        bar.setValue(conf)
+        imgPixScaled = imgPix.scaledToHeight(100)
+        pic.setPixmap(imgPixScaled)
 
+class cardConf(QtCore.QRunnable):
+
+    def _init_(self,conf):
+        super(cardConf, self)._init_()
+        self.card = card
+        self.conf = conf
+        self.bar = QtGui.QProgressBar(self)
+        self.bar.setGeometry(200,80,250,20)
+
+    def cardBar(self):
+        # Create Progress Bar
+        bar.setValue(conf)
 
 class App(QDialog):
 
