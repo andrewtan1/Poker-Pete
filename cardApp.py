@@ -116,12 +116,6 @@ for card,conf in ccDict_fixed.items():
     # append card img to each key
     #ccDict_fixed[card].
 sorted_cc = sorted(ccDict_fixed.items(), key=operator.itemgetter(1), reverse=True)
-'''
-#Display Image
-pic = QtWidgets.QLabel(window)
-pic.setGeometry(10, 10, 238, 333) #TODO: Change geometry to be size of resized image
-pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/card_imgs/10C.png"))
-'''
 
 class App(QDialog):
     def __init__(self):
@@ -150,49 +144,28 @@ class App(QDialog):
         self.horizontalGroupBox = QGroupBox("Cards-Confidence List")
         layout = QGridLayout()
         layout.setColumnStretch(1, 7)
-        cardList = [item[0] for item in sorted_cc]
-        confList = [item[1] for item in sorted_cc]
-        '''
-        #layout.addWidget(QtWidgets.QLabel(cardList[0]),0,0) #Debugging
-        layout.addWidget(cardImg(),0,0)
-        layout.addWidget(cardConf(),0,1)'''
-        '''pic = QtWidgets.QLabel(self)
-        #pic.setGeometry(10, 10, 71, 100) 
-        img_dir = os.path.join('card_imgs','9S'+"."+'png')
-        imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
-        imgPixScaled = imgPix.scaledToHeight(70)
-        pic.setPixmap(imgPixScaled)
-        #self.resize(imgPixScaled.width(),imgPixScaled.height())
-        layout.addWidget(pic)'''
+
         card_dir = "card_imgs"
         extension = "png"
+        cardList = [item[0] for item in sorted_cc]
+        confList = [item[1] for item in sorted_cc]
+        
         for ind in range(len(sorted_cc)):
             # Create Card Image Widget
             pic = QtWidgets.QLabel(self) 
             img_dir = os.path.join(card_dir,cardList[ind]+"."+extension)
             imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
-            imgPixScaled = imgPix.scaledToHeight(70)
+            imgPixScaled = imgPix.scaledToHeight(98) # 98x70 image
             pic.setPixmap(imgPixScaled)
             self.resize(imgPixScaled.width(),imgPixScaled.height())
             layout.addWidget(pic,ind,0)
             # Create Project Bar Widget
             bar = QtWidgets.QProgressBar(self)
-            #bar.setGeometry(10,10,500,70)
             bar.setValue(confList[ind])
             layout.addWidget(bar,ind,1)
         
         self.horizontalGroupBox.setLayout(layout)
-
-'''app = QApplication(sys.argv)
-window = QtWidgets.QMainWindow()
-window.setGeometry(0,0,400,200)
-layout = QGridLayout()
-'''
-
-
-'''QProgressBar *proBar = new QProgressBar
-    proBar.set
-    layout.addWidget(QProgressBar(ccDict_fixed[card]))'''
+        
 #Debugging
 #for k,v in ccDict.items():
 #    print(k,v)
@@ -201,8 +174,8 @@ layout = QGridLayout()
 #print(*cardList)
 #print(*confList)
 #print(results)
-print(ccDict_fixed)
-print(sorted_cc)
+#print(ccDict_fixed)
+#print(sorted_cc)
 
 
 
