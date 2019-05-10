@@ -2,6 +2,7 @@
 
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout, QProgressBar, QGridLayout, QDialog, QGroupBox
 from PyQt5.QtGui import QIcon
+from PyQt5 import QtGui
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 import matplotlib.pyplot as plt
@@ -122,26 +123,33 @@ pic.setGeometry(10, 10, 238, 333) #TODO: Change geometry to be size of resized i
 pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/card_imgs/10C.png"))
 '''
 
-class cardImg(QtCore.QRunnable):
+class cardImg(QWidget):
 
-    def _init_(self,card,window):
+    def _init_(self):
         super(cardImg, self)._init_()
-        self.card = card
-        self.window = window
-        self.card_dir = "card_imgs"
-        self.extension = "png"
+        #self.window = QtWidgets.QMainWindow()
+        card_dir = "card_imgs"
+        extension = "png"
+        cardList = sorted_cc
+        numCard = len(cardList)
+        lay = QVBoxLayout(self)
+        self.cardBar()
 
     def cardBar(self):
         # Image Representation of Card
-        pic = QtWidgets.QLabel(window)
-        img_dir = os.path.join(card_dir,card+"."+extension)
-        imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
-        imgPixScaled = imgPix.scaledToHeight(100)
-        pic.setPixmap(imgPixScaled)
+        for ind in range(numCard):
+            pic = QtWidgets.QLabel(self)
+            #pic.setGeometry(10, 10, 71, 100) 
+            img_dir = os.path.join(card_dir,cardList[ind]+"."+extension)
+            imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
+            imgPixScaled = imgPix.scaledToHeight(100)
+            pic.setPixmap(imgPixScaled)
+            self.resize(imgPixScaled.width(),imgPixScaled.height())
+            lay.addWidget(pic)
 
-class cardConf(QtCore.QRunnable):
+class cardConf(QWidget):
 
-    def _init_(self,conf):
+    def _init_(self,*conf):
         super(cardConf, self)._init_()
         self.card = card
         self.conf = conf
@@ -154,21 +162,21 @@ class cardConf(QtCore.QRunnable):
 
 class App(QDialog):
 
-    def __init__(self, list):
-        super().__init__()
-        self.title = 'Card-Confidence Display'
+    def __init__(self):
+        super(App, self).__init__()
+        self.title = 'Poker Pete Visualization'
         self.left = 200
         self.top = 200
         self.width = 500
         self.height = 500
+        self.window = QtWidgets.QMainWindow()
         self.initUI()
         
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        self.bar = QProgressBar(self)
-
-        self.createGridLayout()
+        
+        self.createLayout()
         
         windowLayout = QVBoxLayout()
         windowLayout.addWidget(self.horizontalGroupBox)
@@ -176,18 +184,20 @@ class App(QDialog):
         
         self.show()
     
-    def createGridLayout(self):
-        self.horizontalGroupBox = QGroupBox("Grid")
+    def createLayout(self):
+        self.horizontalGroupBox = QGroupBox("Cards-Confidence List")
         layout = QGridLayout()
         layout.setColumnStretch(1, 7)
-        
-        layout.addWidget(QPushButton('1'),0,0)
-        layout.addWidget(QPushButton('2'),0,1)
-        layout.addWidget(QPushButton('4'),1,0)
-        layout.addWidget(QPushButton('5'),1,1)
-        layout.addWidget(QPushButton('7'),2,0)
-        layout.addWidget(QPushButton('8'),2,1)
-        
+        cardNames = [cList[0] for cList in cardList]
+        layout.addWidget(cardImg())
+        '''for item in range(self.numItems):
+            card = self.card_list[item]
+            imgArg = {"cardNum": card[0], "window":self.window}
+            img = cardImg(imgArg)
+            bar = cardConf(card[1])
+            layout.addWidget(img,item,0)
+            layout.addWidget(bar,item,1)
+        '''
         self.horizontalGroupBox.setLayout(layout)
 
 '''app = QApplication(sys.argv)
@@ -209,7 +219,7 @@ layout = QGridLayout()
 #print(*confList)
 #print(results)
 print(ccDict_fixed)
-print(sorted_cc[1])
+print(sorted_cc)
 
 
 
@@ -223,7 +233,7 @@ plt.imshow(boxing(original_img, results, threshold))
 '''
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = App(sorted_cc)
+    ex = App()
     sys.exit(app.exec_())
 '''
 window.setLayout(layout)
