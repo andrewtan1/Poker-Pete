@@ -123,53 +123,6 @@ pic.setGeometry(10, 10, 238, 333) #TODO: Change geometry to be size of resized i
 pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/card_imgs/10C.png"))
 '''
 
-class cardImg(QWidget):
-    def _init_(self):
-        super(cardImg, self)._init_()
-        card_dir = "card_imgs"
-        extension = "png"
-        cardList = [item[0] for item in sorted_cc]
-        numCard = len(cardList)
-        lay = QVBoxLayout(self)
-        self.imgList()
-
-    def imgList(self):
-        # Image Representation of Card
-        '''#TODO: DEBUG TEST
-        pic = QtWidgets.QLabel(self)
-        img_dir = os.path.join("card_imgs","9S"+"."+"png")
-        imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
-        imgScaled = imgPix.scaledToHeight(70)
-        pic.setPixmap(imgScaled)
-        self.resize(imgScaled.width(),imgScaled.height())
-        lay.addWidget(pic)
-        ## END TEST'''
-        for ind in range(numCard):
-            pic = QtWidgets.QLabel(self)
-            #pic.setGeometry(10, 10, 71, 100) 
-            img_dir = os.path.join(card_dir,cardList[ind]+"."+extension)
-            imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
-            imgPixScaled = imgPix.scaledToHeight(70)
-            pic.setPixmap(imgPixScaled)
-            self.resize(imgPixScaled.width(),imgPixScaled.height())
-            lay.addWidget(pic)
-
-class cardConf(QWidget):
-    def _init_(self):
-        super(cardConf, self)._init_()
-        confList = [item[1] for item in sorted_cc]
-        numCard = len(confList)
-        lay = QVBoxLayout(self)
-        self.cardBar()
-
-    def cardBar(self):
-        for ind in range(numCard):
-            bar = QtGui.QProgressBar(self)
-            bar.setGeometry(10,10,500,70)
-            # Create Progress Bar
-            bar.setValue(confList[ind])
-            lay.addWidget(bar)
-
 class App(QDialog):
     def __init__(self):
         super(App, self).__init__()
@@ -198,25 +151,36 @@ class App(QDialog):
         layout = QGridLayout()
         layout.setColumnStretch(1, 7)
         cardList = [item[0] for item in sorted_cc]
+        confList = [item[1] for item in sorted_cc]
+        '''
         #layout.addWidget(QtWidgets.QLabel(cardList[0]),0,0) #Debugging
         layout.addWidget(cardImg(),0,0)
-        layout.addWidget(cardConf(),0,1)
+        layout.addWidget(cardConf(),0,1)'''
         '''pic = QtWidgets.QLabel(self)
         #pic.setGeometry(10, 10, 71, 100) 
-        img_dir = os.path.join('card_imgs','9S'+"."+extension)
+        img_dir = os.path.join('card_imgs','9S'+"."+'png')
         imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
         imgPixScaled = imgPix.scaledToHeight(70)
         pic.setPixmap(imgPixScaled)
-        self.resize(imgPixScaled.width(),imgPixScaled.height())
-        lay.addWidget(pic)'''
-        '''for item in range(self.numItems):
-            card = self.card_list[item]
-            imgArg = {"cardNum": card[0], "window":self.window}
-            img = cardImg(imgArg)
-            bar = cardConf(card[1])
-            layout.addWidget(img,item,0)
-            layout.addWidget(bar,item,1)
-        '''
+        #self.resize(imgPixScaled.width(),imgPixScaled.height())
+        layout.addWidget(pic)'''
+        card_dir = "card_imgs"
+        extension = "png"
+        for ind in range(len(sorted_cc)):
+            # Create Card Image Widget
+            pic = QtWidgets.QLabel(self) 
+            img_dir = os.path.join(card_dir,cardList[ind]+"."+extension)
+            imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
+            imgPixScaled = imgPix.scaledToHeight(70)
+            pic.setPixmap(imgPixScaled)
+            self.resize(imgPixScaled.width(),imgPixScaled.height())
+            layout.addWidget(pic,ind,0)
+            # Create Project Bar Widget
+            bar = QtWidgets.QProgressBar(self)
+            #bar.setGeometry(10,10,500,70)
+            bar.setValue(confList[ind])
+            layout.addWidget(bar,ind,1)
+        
         self.horizontalGroupBox.setLayout(layout)
 
 '''app = QApplication(sys.argv)
