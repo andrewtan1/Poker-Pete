@@ -100,7 +100,7 @@ for card,conf in ccDict_fixed.items():
 sorted_cc = sorted(ccDict_fixed.items(), key=operator.itemgetter(1), reverse=True)
 
 # Create a list of Tuples for the number representation of each card
-# Map Ranks to Numbers for Calculations
+# Map Ranks to Numbers for Calculations (Following the Mappings at the top of 'poker hand.py')
 def rankMap(rank):
     rankNum = {
         'A':0,
