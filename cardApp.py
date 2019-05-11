@@ -99,6 +99,50 @@ for card,conf in ccDict_fixed.items():
     ccDict_fixed[card] = newConf
 sorted_cc = sorted(ccDict_fixed.items(), key=operator.itemgetter(1), reverse=True)
 
+# Create a list of Tuples for the number representation of each card
+# Map Ranks to Numbers for Calculations
+def rankMap(rank):
+    rankNum = {
+        'A':0,
+        '2':1,
+        '3':2,
+        '4':3,
+        '5':4,
+        '6':5,
+        '7':6,
+        '8':7,
+        '9':8,
+        '10':9,
+        'J':10,
+        'Q':11,
+        'K':12
+    }
+    return rankNum.get(rank,"no rank")
+# Map Suits to Numbers for Calculations
+def suitMap(suit):
+    suitNum = {
+        'D':0,
+        'C':1,
+        'H':2,
+        'S':3
+    }
+    return suitNum.get(suit,"no suit")
+# Iterate through each detected card and map to numbers
+cards = [item[0] for item in sorted_cc]
+rankList = []
+suitList = []
+for c in cards:
+    if len(c)>2:
+        rank = c[:2]
+        suit = c[2:3]
+    else:
+        rank = c[:1]
+        suit = c[1:2]
+    rankList.append(rankMap(rank))
+    suitList.append(suitMap(suit))
+cardNumConv = list(zip(rankList,suitList))
+print(cardNumConv) # Check Output
+
 class App(QDialog):
     def __init__(self):
         super(App, self).__init__()
