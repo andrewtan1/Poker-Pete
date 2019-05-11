@@ -1,5 +1,6 @@
 from scipy.optimize import linprog
 import numpy as np
+import random
 def solve(A):
 
     #Player 2 Optimal
@@ -59,7 +60,8 @@ def main():
 
     p_junk = 0.501177
     p_pair = 0.422569
-    p_high = 1 - p_junk - p_pair
+    #p_two_pair = 0.047539
+    p_high = 1 - p_junk - p_pair #- p_two_pair
     p = [p_high, p_pair, p_junk]
     prob = np.zeros((n,n))
     for i in range(n):
@@ -69,9 +71,12 @@ def main():
 
     p1 = ["" for x in range(pow(3,n))]
     p2 = ["" for x in range(pow(4,n))]
+
+
     for i in range(3):
         for j in range(3):
             for k in range(3):
+            
                 str = ""
                 if i == 0:
                     str = str + "A"
@@ -96,6 +101,7 @@ def main():
     for i in range(4):
         for j in range(4):
             for k in range(4):
+            
                 str = ""
                 if i == 0:
                     str = str + "A"
@@ -121,6 +127,8 @@ def main():
                     str = str + "C"
                 elif k == 3:
                     str = str + "P"
+
+                
                 p2[k + 4*j + 16*i] = str
     
     A = np.zeros((pow(3,n), pow(4,n)))
@@ -132,18 +140,18 @@ def main():
             for k in range(n):
                 for l in range(n):
                     payoff = 0
-                    # HARD WORK GOES HERE
+                    # k is P1's hand strength, l is P2's
                     s1 = str1[k]
                     s2 = str2[l]
                     if (s1 == "A" and s2 == "A") or (s1 == "A" and s2 == "S") or (s1 == "S" and s2 == "A") or (s1 == "S" and s2 == "C"):
-                        if k > l:
+                        if k < l:
                             payoff = 2
                         elif k == l:
                             payoff = 0
                         else:
                             payoff = -2
                     elif (s1 == "S" and s2 == "S") and (s1 == "S" and s2 == "P") or (s1 == "P" and s2 == "S") or (s1 == "P" and s2 == "P"):
-                        if k > l:
+                        if k < l:
                             payoff = 1
                         elif k == l:
                             payoff = 0
@@ -169,6 +177,14 @@ def main():
         if(y[i] > 0.001):
             print(p2[i], end = " ")
             print(y[i])
+    r = random.uniform(0,1)
+    k = 0
+    while r > 0:
+        r = r - y[k]
+        k = k + 1
+    
+        
+
     
 if __name__ == "__main__" :
     main()
