@@ -143,6 +143,7 @@ for c in cards:
 cardNumConv = list(zip(rankList,suitList))
 print(cardNumConv) # Check Output
 
+# Card-Confidence List Visualization
 class App(QDialog):
     def __init__(self):
         super(App, self).__init__()
