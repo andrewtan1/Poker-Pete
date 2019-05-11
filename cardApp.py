@@ -133,11 +133,11 @@ rankList = []
 suitList = []
 for c in cards:
     if len(c)>2:
-        rank = c[:2]
-        suit = c[2:3]
+        rank = c[:2]    #aka if 10 take first two characters
+        suit = c[2:3]   #last character is suit
     else:
-        rank = c[:1]
-        suit = c[1:2]
+        rank = c[:1]    #first character is rank
+        suit = c[1:2]   #last character is suit
     rankList.append(rankMap(rank))
     suitList.append(suitMap(suit))
 cardNumConv = list(zip(rankList,suitList))
