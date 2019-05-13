@@ -13,6 +13,7 @@ import numpy as np
 import sys
 import logging as log
 import operator
+import ctypes
 
 class recordVideo:
     def __init__(self, camera_port=0):
@@ -78,6 +79,8 @@ results = [
    {'label': '5S', 'confidence': 0.0014446479, 'topleft': {'x': 156, 'y': 209}, 'bottomright': {'x': 262, 'y': 315}}
 ]
 
+user32 = ctypes.windll.user32
+screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
 
 itCnt = 0
 #If detected 5 out of the last 10 fromes, detected.
@@ -85,7 +88,7 @@ confidence = 0
 detDict = {}
 
 # Declare Confidence Threshold for Display
-thresh = 0.1
+thresh = 0.0
 
 # Grab Detected Cards w/ their Confidences
 cardList = [d['label'] for d in results]
@@ -98,6 +101,25 @@ for card,conf in ccDict_fixed.items():
     newConf = float("{0:.1f}".format(ccDict_fixed[card]*100))
     ccDict_fixed[card] = newConf
 sorted_cc = sorted(ccDict_fixed.items(), key=operator.itemgetter(1), reverse=True)
+
+# Output String Name of Card Rank
+def rankNameMap(rank_id):
+    rankName = {
+        'A':'Ace',
+        'J':'Jack',
+        'Q':'Queen',
+        'K':'King'
+    }
+    return rankName.get(rank_id,rank_id)
+# Output String Name of Card Suit
+def suitNameMap(suit_id):
+    suitName = {
+        'D':'Diamonds',
+        'C':'Clubs',
+        'H':'Hearts',
+        'S':'Spades'
+    }
+    return suitName.get(suit_id,'invalid suit')
 
 # Create a list of Tuples for the number representation of each card
 # Map Ranks to Numbers for Calculations (Following the Mappings at the top of 'poker hand.py')
@@ -149,9 +171,9 @@ class App(QDialog):
         super(App, self).__init__()
         self.title = 'Poker Pete Visualization'
         # Set Window Location/Dimensions At Startup
-        self.left = 200
-        self.top = 200
-        self.width = 500
+        self.left = screensize[0]/2 + 250
+        self.top = 100
+        self.width = 800
         self.height = 500
         self.initUI()
         
@@ -178,18 +200,29 @@ class App(QDialog):
         confList = [item[1] for item in sorted_cc]
         
         for ind in range(len(sorted_cc)):
+            # Create Card Name Widget
+            label = QtWidgets.QLabel()
+            cardID = cardList[ind]
+            if cardID[:2]=='10':
+                rankStr = rankNameMap(cardID[:2])
+                suitStr = suitNameMap(cardID[2:3])
+            else:
+                rankStr = rankNameMap(cardID[:1])
+                suitStr = suitNameMap(cardID[1:2])
+            label.setText(rankStr+' of '+suitStr)
+            layout.addWidget(label,ind,0)
             # Create Card Image Widget
             pic = QtWidgets.QLabel(self) 
             img_dir = os.path.join(card_dir,cardList[ind]+"."+extension)
             imgPix = QtGui.QPixmap(os.getcwd()+"/"+img_dir)
-            imgPixScaled = imgPix.scaledToHeight(98) # 98x70 image
+            imgPixScaled = imgPix.scaledToHeight(70) # 84x60 image
             pic.setPixmap(imgPixScaled)
             self.resize(imgPixScaled.width(),imgPixScaled.height())
-            layout.addWidget(pic,ind,0)
+            layout.addWidget(pic,ind,1)
             # Create Project Bar Widget
             bar = QtWidgets.QProgressBar(self)
             bar.setValue(confList[ind])
-            layout.addWidget(bar,ind,1)
+            layout.addWidget(bar,ind,2)
         
         self.horizontalGroupBox.setLayout(layout)
         
