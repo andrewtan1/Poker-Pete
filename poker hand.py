@@ -286,8 +286,19 @@ def read_strength(hand):
     elif s > 300:
         print("Three of a Kind of", end = " ")
         print(rank)
+
     elif s > 200:
-        print("Two Pairs")
+        ranks = get_ranks(hand)
+        p1 = rank
+        p2 = " "
+        unique, counts = np.unique(ranks, return_counts = True)
+        for i in range(unique.size):
+            if counts[i] == 2 and unique[i] != t:
+                p2 = rankMap(unique[i])
+    
+        print("Two Pairs of", end = " ")
+        print(p1, end = " and ")
+        print(p2)
     elif s > 100:
         print("One Pair of", end = " ")
         print(rank)
@@ -429,9 +440,9 @@ def estimate_probability(hand):
 
 
 def main():
-    hand = np.array([0,9,10,11,12])
+    hand = np.array([2, 11, 37, 12, 25])
     
-    hand = generate_hand(5)
+   # hand = generate_hand(5)
     print(hand)
     read_hand(hand)
     print("Strength is", end = " ")
