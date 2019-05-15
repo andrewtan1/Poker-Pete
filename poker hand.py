@@ -409,7 +409,8 @@ def recommend_move(hand):
 # estimate the probability of getting a LOWER hand
 def estimate_probability(hand):
     s = measure_strength(hand)
-    
+    t = s % 100
+
     if s > 800:
         return 1 - 0.000015
     elif s > 700:
@@ -427,20 +428,23 @@ def estimate_probability(hand):
     elif s > 100:
         #TODO: compute probability
         p = 1 - 0.499
+        i = t
+        while i > 1:
+            p = p + bin(4,2)*bin(12,3)*pow(4,3)/bin(52,5)
+            i = i - 1
         return p
     else:
         #TODO: compute probability 
         p = 0
-        highest_rank = get_ranks(get_highest_card(hand))
         for i in range(6,13):
-            if i == highest_rank:
+            if i == t:
                 return p
             p = p + (4*(bin(i-1,4)*pow(4,4) - pow(4,4) - bin(i-1,4) + 1))/(bin(52,5))
         return p
 
 
 def main():
-    hand = np.array([2, 11, 37, 12, 25])
+    hand = np.array([12,25, 2, 29, 50])
     
    # hand = generate_hand(5)
     print(hand)
@@ -450,8 +454,8 @@ def main():
     print("You have", end = " ")
     read_strength(hand) 
     recommend_move(hand)
-    #print("The probability of a lower hand is", end = " ")
-    #print(estimate_probability(hand))
+    print("The probability of a lower hand is", end = " ")
+    print(estimate_probability(hand))
     
     
        
