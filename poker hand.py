@@ -84,7 +84,10 @@ def read_hand(hand):
         str2 = suitMap(s)
         print(str1, end =" ") 
         print("of", end = " ")
-        print(str2)
+        if i == n - 1:
+            print(str2)
+        else:
+            print(str2, end = ", ")
     return
 
 # compare two cards
@@ -328,11 +331,11 @@ def recommend_move(hand):
 
     s = measure_strength(hand)
     # If straight or higher, keep the cards
-    if s >= 4:
+    if s >= 400:
         print("Keep all cards")
         return
     # If 3 of a kind, throw away the other two cards
-    elif s == 3:
+    elif s >= 300:
         for i in range(5):
             if rank_count[ranks[i]] == 3:
                 #find index in discard_list
@@ -341,7 +344,7 @@ def recommend_move(hand):
         
 
     # If 1 or 2 pairs, throw away nonpaired cards
-    elif s == 2 or s == 1:
+    elif s >= 100:
         for i in range(5):
             if rank_count[ranks[i]] == 2:
                 #find index in discard_list
@@ -391,20 +394,16 @@ def recommend_move(hand):
                         close_to_straight = True
                         discard_list = temp
 
-
+        # If not close to flush or straight, keep all high cards according to rank threshold
         if close_to_flush == False and close_to_straight == False:
+            rank_threshold = 10
             ranks[ranks == 0] = 13
             for i in range(5): 
-                if ranks[i] >= 10:
+                if ranks[i] >= rank_threshold:
                     ind = discard_list.index(i+1)
                     discard_list.pop(ind) 
                
-    print("Discard card(s)", end = " ")
-    for x in discard_list:
-
-        print(x, end = " ")
-    print(" ")
-    return
+    return discard_list
 
 # estimate the probability of getting a LOWER hand
 def estimate_probability(hand):
@@ -442,20 +441,125 @@ def estimate_probability(hand):
             p = p + (4*(bin(i-1,4)*pow(4,4) - pow(4,4) - bin(i-1,4) + 1))/(bin(52,5))
         return p
 
+# Simulate a game of poker (note: there is an issue of cards reappearing)
+
+def play_game():
+    play = True
+    p1_pool = 10
+    p2_pool = 10
+    num_rounds = 3
+    
+    while play == True and p1_pool > 0 and p2_pool > 0:
+        winner = 0
+        p = input("Play? [y/n]: ")
+        if p == 'y' or p == 'Y' or p1_pool <= 0 or p2_pool <= 0:
+            p1_pool = p1_pool - 1
+            p2_pool = p2_pool - 1
+            pool = 2
+
+            start = generate_hand(10)
+            used = start
+            p1_hand = start[0:5]
+            p2_hand = start[5:10]
+
+            for i in range(num_rounds):
+                print("Your current hand is: ")
+                print(p1_hand)
+                read_hand(p1_hand)
+                invalid = True
+                action = input("What would you like to do? [bet/check]:")
+                while invalid == True:
+                    if action == "bet" or action == "check":
+                        invalid = False
+                    else:
+                        action = input("Invalid action, try again. [bet/check]:")
+                if action == "bet":
+                    p1_pool = p1_pool - 1
+                    pool = pool + 1
+                    # p2 calls
+                    print("The opponent calls!")
+                    p2_pool = p2_pool - 1
+                    pool = pool + 1
+
+                #elif action == "check":
+
+                print("List the cards you want to discard (no commas!):")
+                discard = list(map(int,input().split()))
+                for x in discard:
+                    redundant = True
+                    new_card = random.randint(0,51)
+                    while redundant == True:
+                        if not np.all(used[:] == new_card):
+                            redundant = False
+                            used = [used, new_card]
+                            p1_hand[x-1] = new_card
+
+                p2_discard  = recommend_move(p2_hand)
+                for x in p2_discard:
+                    redundant = True
+                    new_card = random.randint(0,51)
+                    while redundant == True:
+                        if not np.all(used[:] == new_card):
+                            redundant = False
+                            used = [used, new_card]
+                            p2_hand[x-1] = new_card
+            print("Your final hand is: ")
+            read_hand(p1_hand)
+            read_strength(p1_hand)
+            print("The opponent's final hand is: ")
+            read_hand(p2_hand)
+            read_strength(p2_hand)
+            s1 = measure_strength(p1_hand)    
+            s2 = measure_strength(p2_hand)
+
+            
+            if s1 > s2:
+                winner = 1
+            elif s1 < s2:
+                winner = 2
+            else:
+                winner = compare_cards(get_highest_card(p1_hand), get_highest_card(p2_hand))
+
+            if winner == 1:
+                p1_pool = p1_pool + pool
+                print("You won! You currently have", end = " ") 
+                print(p1_pool, end = " ")
+                print("points")  
+
+            elif winner == 2:
+                p2_pool = p2_pool + pool
+                print("You lost! You currently have", end = " ")
+                print(p1_pool, end = " ")
+                print("points")
+
+        else:
+            play = False
+    print("Game over! Your final score is", end = " ")
+    print(p1_pool, end = " ")
+    print("points")
+
+
+    return
 
 def main():
+    """
     hand = np.array([12,25, 2, 29, 50])
-    
-   # hand = generate_hand(5)
+    hand = generate_hand(5)
     print(hand)
     read_hand(hand)
-    print("Strength is", end = " ")
-    print(measure_strength(hand))
+    #print("Strength is", end = " ")
+    #print(measure_strength(hand))
     print("You have", end = " ")
     read_strength(hand) 
     recommend_move(hand)
     print("The probability of a lower hand is", end = " ")
     print(estimate_probability(hand))
+    print("Discard card(s)", end = " ")
+    discard_list = recommend_move(hand)
+    print(discard_list)
+    """
+    play_game()
+    
     
     
        
