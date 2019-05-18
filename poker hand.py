@@ -1,6 +1,6 @@
 # Card mapping: Let c=0,...51 be the card number
 # Then c mod 13 refers to the rank, and floor(c/13) is the suit
-# Ranks: A -> 0, 2 -> 1,  ...  , J -> 10, Q -> 11, K -> 12
+# Ranks: A -> 0, 2 -> 1,  ...  , J -> 10, Q -> 11, K -> 12, A -> 13
 # Suits: D -> 0, C -> 1, H -> 2, S -> 3
 # e.g. c = 17 => c = 4 mod 13, floor(c/13) = 1, so it's the 5 of clubs
 # Hands will be enumerated from 0 to 8 as follows: junk, pair, two pairs,
@@ -63,6 +63,7 @@ def get_ranks(hand):
     ranks = np.zeros((n,), dtype=int)
     for i in range(n):
         ranks[i] = hand[i] % 13
+        # Change ace to have rank 13
         ranks[ranks == 0] = 13    
     return ranks
 def get_suits(hand):
@@ -71,6 +72,25 @@ def get_suits(hand):
     for i in range(n):
         suits[i] = hand[i] / 13
     return suits
+
+
+def compute_blackjack_sum(hand):
+    sum = 0
+    ranks = get_ranks(hand)
+    n = len(hand)
+    for i in range(n):
+        if ranks[i] == 13:
+            sum = sum + 11
+        if ranks[i] >= 9:
+            sum = sum + 10
+        else:
+            sum = sum + (ranks[i]+1)
+    if sum > 21:
+        for i in range(n):
+            # Should still check if sum > 21 in case there are multiple aces
+            if ranks[i] == 13 and sum > 21:
+                sum = sum - 10
+    return sum
 
 # Print out the cards
 def read_hand(hand):
