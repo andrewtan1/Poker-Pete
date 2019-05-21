@@ -353,7 +353,8 @@ def recommend_move(hand):
     # If straight or higher, keep the cards
     if s >= 400:
         print("Keep all cards")
-        return
+        return []
+    
     # If 3 of a kind, throw away the other two cards
     elif s >= 300:
         for i in range(5):
@@ -507,22 +508,25 @@ def play_game():
                 discard = list(map(int,input().split()))
                 for x in discard:
                     redundant = True
-                    new_card = random.randint(0,51)
                     while redundant == True:
-                        if not np.all(used[:] == new_card):
+                        new_card = random.randint(0,51)
+                        if np.any(used[:] == new_card) == False:
                             redundant = False
-                            used = [used, new_card]
+                            used = np.append(used, new_card)
                             p1_hand[x-1] = new_card
-
+                            print("Used cards p1: ", used)
+                
                 p2_discard  = recommend_move(p2_hand)
                 for x in p2_discard:
                     redundant = True
-                    new_card = random.randint(0,51)
                     while redundant == True:
-                        if not np.all(used[:] == new_card):
+                        new_card = random.randint(0,51)
+                        if np.any(used[:] == new_card) == False:
                             redundant = False
-                            used = [used, new_card]
+                            used = np.append(used, new_card)
                             p2_hand[x-1] = new_card
+                            print("Used cards p2: ", used)
+                            
             print("Your final hand is: ")
             read_hand(p1_hand)
             read_strength(p1_hand)
@@ -579,10 +583,7 @@ def main():
     print(discard_list)
     """
     play_game()
-    
-    
-    
        
-if __name__ == "__main__" :
-    main()
-  
+main()
+    
+#%%
