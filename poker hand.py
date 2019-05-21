@@ -27,6 +27,7 @@ def rankMap(rank):
         13 : "Ace",
     }
     return rankNum.get(rank,"invalid rank")
+
 # Map Suits to Numbers for Calculations
 def suitMap(suit):
     suitNum = {
@@ -36,6 +37,7 @@ def suitMap(suit):
         3 : "Spades"
     }
     return suitNum.get(suit,"invalid suit")
+
 def bin(n, k):
     """
     A fast way to calculate binomial coefficients by Andrew Dalke.
@@ -72,7 +74,6 @@ def get_suits(hand):
     for i in range(n):
         suits[i] = hand[i] / 13
     return suits
-
 
 def compute_blackjack_sum(hand):
     sum = 0
@@ -278,38 +279,21 @@ def read_strength(hand):
     high_rank = rankMap(get_ranks(high_card)[0])
     high_suit = suitMap(get_suits(high_card)[0])
     
-
+    output = ""
     if s == 813:
-        print("Royal Flush of ", end = " ")
-        print(high_suit)
-
+        output = "Royal Flush of " + high_suit
     elif s > 800:
-        print("Straight Flush with leading card")
-        print(high_rank, end = " of ")
-        print(high_suit)
-
+        output = "Straight Flush with leading card" + high_rank + " of " + high_suit
     elif s > 700:
-        print("Four of a Kind of", end = " ")
-        print(rank)
-
+        output = "Four of a Kind of " + rank
     elif s > 600:
-        print("Full House of", end = " ")
-        print(rank)
-
+        output = "Full House of " + rank
     elif s > 500:
-        print("Flush of", end = " ")
-        print(high_suit, end = ". Highest card is ")
-        print(high_rank, end = " of ")
-        print(high_suit)
-
+        output = "Flush of " + high_suit + ". Highest card is " + high_rank + " of " + high_suit
     elif s > 400:
-        print("Straight with leading card", end =" ")
-        print(high_rank, end = " of ")
-        print(high_suit)
+        output = "Straight with leading card " + high_rank + " of " + high_suit
     elif s > 300:
-        print("Three of a Kind of", end = " ")
-        print(rank)
-
+        output = "Three of a Kind of " + rank
     elif s > 200:
         ranks = get_ranks(hand)
         p1 = rank
@@ -318,21 +302,14 @@ def read_strength(hand):
         for i in range(unique.size):
             if counts[i] == 2 and unique[i] != t:
                 p2 = rankMap(unique[i])
-    
-        print("Two Pairs of", end = " ")
-        print(p1, end = " and ")
-        print(p2)
+        output = "Two Pairs of " + p1 + " and " + p2
     elif s > 100:
-        print("One Pair of", end = " ")
-        print(rank)
+        output = "One Pair of " + rank
     else:
-        print("Nothing. Highest card is", end = " ")
-        print(high_rank, end = " of ")
-        print(high_suit)
-        
+        output = "Nothing. Highest card is " + high_rank + " of " + high_suit
 
-    
-    return
+    print(output)
+    return output
 
 def recommend_move(hand):
     discard_list = [1,2,3,4,5]
