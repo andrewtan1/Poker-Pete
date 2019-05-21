@@ -525,19 +525,19 @@ def play_game():
                 p1_pool = p1_pool + pool
                 print("You won! You currently have", end = " ") 
                 print(p1_pool, end = " ")
-                print("dollars")  
+                print("points")  
 
             elif winner == 2:
                 p2_pool = p2_pool + pool
                 print("You lost! You currently have", end = " ")
                 print(p1_pool, end = " ")
-                print("dollars")
+                print("points")
 
         else:
             play = False
     print("Game over! Your final score is", end = " ")
     print(p1_pool, end = " ")
-    print("dollars")
+    print("points")
 
 
     return
