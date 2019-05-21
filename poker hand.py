@@ -439,20 +439,21 @@ def estimate_probability(hand):
             p = p + (4*(bin(i-1,4)*pow(4,4) - pow(4,4) - bin(i-1,4) + 1))/(bin(52,5))
         return p
 
-# Simulate a game of poker (note: there is an issue of cards reappearing)
+# Simulate a game of poker (start with Borel model where P1 can fold first)
 
 def play_game():
     play = True
     p1_pool = 10
     p2_pool = 10
     num_rounds = 3
+    ante = 1
     
     while play == True and p1_pool > 0 and p2_pool > 0:
         winner = 0
         p = input("Play? [y/n]: ")
         if p == 'y' or p == 'Y' or p1_pool <= 0 or p2_pool <= 0:
-            p1_pool = p1_pool - 1
-            p2_pool = p2_pool - 1
+            p1_pool = p1_pool - ante
+            p2_pool = p2_pool - ante
             pool = 2
 
             start = generate_hand(10)
