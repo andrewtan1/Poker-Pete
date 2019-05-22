@@ -443,8 +443,8 @@ def estimate_probability(hand):
 
 def play_game():
     play = True
-    p1_pool = 10
-    p2_pool = 10
+    p1_pool = 100
+    p2_pool = 100
     num_rounds = 2
     ante = 1
     
@@ -466,7 +466,7 @@ def play_game():
             for i in range(num_rounds):
                 
                 # By default, player 2 will bet 20% (adjustable) of their current pool
-                p2_bet = round(p2_pool / 5)
+                p2_bet = 3.62
 
                 print("Your current hand is: ")
                 print(p1_hand)
@@ -480,7 +480,7 @@ def play_game():
                         action = input("Invalid action, try again. [bet/check]:")
                 if action == "bet":
                     bet = input("How much would you like to bet? ")
-                    bet = int(bet)
+                    bet = float(bet)
                     #Get P2's hands' relative strength to make a decision 
                   
                     # P2 will call if y > n
@@ -506,8 +506,8 @@ def play_game():
                 elif action == "check":
                     # P2 will bet after P1 checks when  y > u or y < t 
 
-                    u = (0.5*(p2_bet+2)*(p2_bet+1) + p2_bet)/((p2_bet+4)*(p2_bet+1))
-                    t = (p2_bet*(p2_bet+2)- 0.5*p2_bet*(p2_bet+1))/((p2_bet+4)*(p2_bet+1))
+                    u = 0.797
+                    t = 0.131
                     y = estimate_probability(p2_hand)
                     if y > u or y < t:
                         print("The opponent bets", end = " ")
