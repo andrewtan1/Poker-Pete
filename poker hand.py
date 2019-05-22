@@ -439,22 +439,24 @@ def estimate_probability(hand):
             p = p + (4*(bin(i-1,4)*pow(4,4) - pow(4,4) - bin(i-1,4) + 1))/(bin(52,5))
         return p
 
-# Simulate a game of poker (start with Borel model where P1 can fold first)
+# Simulate a game of poker (start with symmetric Neumann model)
 
 def play_game():
     play = True
     p1_pool = 10
     p2_pool = 10
-    num_rounds = 3
+    num_rounds = 2
     ante = 1
     
     while play == True and p1_pool > 0 and p2_pool > 0:
         winner = 0
+        folded = False
+
         p = input("Play? [y/n]: ")
         if p == 'y' or p == 'Y' or p1_pool <= 0 or p2_pool <= 0:
             p1_pool = p1_pool - ante
             p2_pool = p2_pool - ante
-            pool = 2
+            pool = 2 * ante
 
             start = generate_hand(10)
             used = start
@@ -462,6 +464,10 @@ def play_game():
             p2_hand = start[5:10]
 
             for i in range(num_rounds):
+                
+                # By default, player 2 will bet 20% (adjustable) of their current pool
+                p2_bet = round(p2_pool / 5)
+
                 print("Your current hand is: ")
                 print(p1_hand)
                 read_hand(p1_hand)
@@ -473,15 +479,65 @@ def play_game():
                     else:
                         action = input("Invalid action, try again. [bet/check]:")
                 if action == "bet":
-                    p1_pool = p1_pool - 1
-                    pool = pool + 1
-                    # p2 calls
-                    print("The opponent calls!")
-                    p2_pool = p2_pool - 1
-                    pool = pool + 1
+                    bet = input("How much would you like to bet? ")
+                    bet = int(bet)
+                    #Get P2's hands' relative strength to make a decision 
+                  
+                    # P2 will call if y > n
+                    
+                    n = 0.5   # will change later
+                    y = estimate_probability(p2_hand)
+                    if y > n:
+                        print("The opponent calls!")
+                        p1_pool = p1_pool - bet
+                        pool = pool + bet
+                        p2_pool = p2_pool - bet
+                        pool = pool + bet
+                    else:
+                        print("The opponent folds!")
+                        p1_pool = p1_pool + pool
+                        print("You won! You currently have", end = " ") 
+                        print(p1_pool, end = " ")
+                        print("dollars") 
+                        folded = True
+                        break
+                    
 
-                #elif action == "check":
+                elif action == "check":
+                    # P2 will bet after P1 checks when  y > u or y < t 
 
+                    u = (0.5*(p2_bet+2)*(p2_bet+1) + p2_bet)/((p2_bet+4)*(p2_bet+1))
+                    t = (p2_bet*(p2_bet+2)- 0.5*p2_bet*(p2_bet+1))/((p2_bet+4)*(p2_bet+1))
+                    y = estimate_probability(p2_hand)
+                    if y > u or y < t:
+                        print("The opponent bets", end = " ")
+                        print(p2_bet, end = " ")
+                        print("dollars!")
+
+                        invalid = True
+                        action = input("What would you like to do? [call/fold]:")
+                        while invalid == True:
+                            if action == "call" or action == "fold":
+                                invalid = False
+                            else:
+                                action = input("Invalid action, try again. [call/fold]:")
+                        if action == "call":
+                            p1_pool = p1_pool - p2_bet
+                            p2_pool = p2_pool - p2_bet
+                            pool = pool + 2 * p2_bet
+                        elif action == "fold":
+                            print("You folded!")
+                            p2_pool = p2_pool + pool
+                            print("You lost! You currently have", end = " ")
+                            print(p1_pool, end = " ")
+                            print("dollars")
+                            folded = True
+                            break
+ 
+                    else:
+                        print("The opponent checks!")
+
+                
                 print("List the cards you want to discard (no commas!):")
                 discard = list(map(int,input().split()))
                 for x in discard:
@@ -492,7 +548,7 @@ def play_game():
                             redundant = False
                             used = np.append(used, new_card)
                             p1_hand[x-1] = new_card
-                            print("Used cards p1: ", used)
+                            
                 
                 p2_discard  = recommend_move(p2_hand)
                 for x in p2_discard:
@@ -503,42 +559,43 @@ def play_game():
                             redundant = False
                             used = np.append(used, new_card)
                             p2_hand[x-1] = new_card
-                            print("Used cards p2: ", used)
                             
-            print("Your final hand is: ")
-            read_hand(p1_hand)
-            read_strength(p1_hand)
-            print("The opponent's final hand is: ")
-            read_hand(p2_hand)
-            read_strength(p2_hand)
-            s1 = measure_strength(p1_hand)    
-            s2 = measure_strength(p2_hand)
 
-            
-            if s1 > s2:
-                winner = 1
-            elif s1 < s2:
-                winner = 2
-            else:
-                winner = compare_cards(get_highest_card(p1_hand), get_highest_card(p2_hand))
 
-            if winner == 1:
-                p1_pool = p1_pool + pool
-                print("You won! You currently have", end = " ") 
-                print(p1_pool, end = " ")
-                print("points")  
+            if folded == False:
+                print("Your final hand is: ")
+                read_hand(p1_hand)
+                read_strength(p1_hand)
+                print("The opponent's final hand is: ")
+                read_hand(p2_hand)
+                read_strength(p2_hand)
+                s1 = measure_strength(p1_hand)    
+                s2 = measure_strength(p2_hand)
+                if s1 > s2:
+                    winner = 1
+                elif s1 < s2:
+                    winner = 2
+                else:
+                    winner = compare_cards(get_highest_card(p1_hand), get_highest_card(p2_hand))
 
-            elif winner == 2:
-                p2_pool = p2_pool + pool
-                print("You lost! You currently have", end = " ")
-                print(p1_pool, end = " ")
-                print("points")
+                if winner == 1:
+                    p1_pool = p1_pool + pool
+                    print("You won! You currently have", end = " ") 
+                    print(p1_pool, end = " ")
+                    print("dollars")  
+
+                elif winner == 2:
+                    p2_pool = p2_pool + pool
+                    print("You lost! You currently have", end = " ")
+                    print(p1_pool, end = " ")
+                    print("dollars")
 
         else:
             play = False
+
     print("Game over! Your final score is", end = " ")
     print(p1_pool, end = " ")
-    print("points")
+    print("dollars")
 
 
     return
