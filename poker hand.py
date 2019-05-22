@@ -9,6 +9,8 @@
 
 import numpy as np
 import random
+
+# Note: just to be careful, Ace will have two different ranks: 0 and 13
 def rankMap(rank):
     rankNum = {
         0 : "Ace",
@@ -38,6 +40,7 @@ def suitMap(suit):
     }
     return suitNum.get(suit,"invalid suit")
 
+# This is just to compute binomial coefficients
 def bin(n, k):
     """
     A fast way to calculate binomial coefficients by Andrew Dalke.
@@ -75,6 +78,7 @@ def get_suits(hand):
         suits[i] = hand[i] / 13
     return suits
 
+# For a game of BLACKJACK, compute the total sum in a player's hand
 def compute_blackjack_sum(hand):
     sum = 0
     ranks = get_ranks(hand)
@@ -204,6 +208,9 @@ def count_multiples(hand):
 
     return np.array([pairs,triples,quadruples])
 
+# Return an ABSOLUTE measure of a hand's strength by checking for each type of poker hand
+# Each type of hand will be denoted by 0,100,200,...,800 from junk to straight flush; some
+# may have subtypes (e.g. for one pair, we have "pair of twos", "pair of threes", etc.)
 def measure_strength(hand):
     straight = has_straight(hand)
     flush = has_flush(hand)
@@ -271,6 +278,7 @@ def measure_strength(hand):
     else:
         return high_rank
 
+# Print the hand type 
 def read_strength(hand):
     s = measure_strength(hand)
     t = s % 100
@@ -311,6 +319,7 @@ def read_strength(hand):
     print(output)
     return output
 
+# For a hand, determine which cards to discard 
 def recommend_move(hand):
     discard_list = [1,2,3,4,5]
     ranks = get_ranks(hand)
@@ -403,7 +412,7 @@ def recommend_move(hand):
                
     return discard_list
 
-# estimate the probability of getting a LOWER hand
+# Get the RELATIVE strength of a hand by estimating the probability of getting a LOWER hand
 def estimate_probability(hand):
     s = measure_strength(hand)
     t = s % 100
@@ -423,7 +432,7 @@ def estimate_probability(hand):
     elif s > 200: 
         return 1 - 0.0762
     elif s > 100:
-        #TODO: compute probability
+        #TODO: compute probability (done, I think)
         p = 1 - 0.499
         i = t
         while i > 1:
@@ -431,7 +440,7 @@ def estimate_probability(hand):
             i = i - 1
         return p
     else:
-        #TODO: compute probability 
+        #TODO: compute probability (done, I think)
         p = 0
         for i in range(6,13):
             if i == t:
@@ -439,7 +448,7 @@ def estimate_probability(hand):
             p = p + (4*(bin(i-1,4)*pow(4,4) - pow(4,4) - bin(i-1,4) + 1))/(bin(52,5))
         return p
 
-# Simulate a game of poker (start with symmetric Neumann model)
+# Simulate a game of poker (symmetric Neumann model)
 
 def play_game():
     play = True
