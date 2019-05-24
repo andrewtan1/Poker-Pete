@@ -448,6 +448,30 @@ def estimate_probability(hand):
             p = p + (4*(bin(i-1,4)*pow(4,4) - pow(4,4) - bin(i-1,4) + 1))/(bin(52,5))
         return p
 
+def bet(bal_p1, bal_p2, tot_pool, val, strength):
+    bet_val = val    
+    # P2 will call if y > n
+    p1_pool = bal_p1
+    p2_pool = bal_p2
+    pool = tot_pool
+    n = 0.5   #TODO: Bet Threshold for Call; will change later
+    y = strength
+    folded = False
+    if y > n:
+        print("The opponent calls!")
+        p1_pool = p1_pool - bet
+        pool = pool + bet
+        p2_pool = p2_pool - bet
+        pool = pool + bet
+    else:
+        print("The opponent folds!")
+        p1_pool = p1_pool + pool
+        print("You won! You currently have", end = " ") 
+        print(p1_pool, end = " ")
+        print("dollars") 
+        folded = True
+    return p1_pool, p2_pool, pool, folded;
+
 # Simulate a game of poker (symmetric Neumann model)
 
 def play_game():
@@ -487,37 +511,20 @@ def play_game():
                         invalid = False
                     else:
                         action = input("Invalid action, try again. [bet/check]:")
+                #Get P2's hands' relative strength to make a decision 
+                y = estimate_probability(p2_hand)
+                
+                u = 0.797   # Opponent Check/Raise Threshold 1
+                t = 0.131   # Opponent Check/Raise Threshold 2
                 if action == "bet":
-                    bet = input("How much would you like to bet? ")
-                    bet = float(bet)
-                    #Get P2's hands' relative strength to make a decision 
-                  
-                    # P2 will call if y > n
+                    bet_val = input("How much would you like to bet? ")
+                    bet_val = float(bet_val)
                     
-                    n = 0.5   # will change later
-                    y = estimate_probability(p2_hand)
-                    if y > n:
-                        print("The opponent calls!")
-                        p1_pool = p1_pool - bet
-                        pool = pool + bet
-                        p2_pool = p2_pool - bet
-                        pool = pool + bet
-                    else:
-                        print("The opponent folds!")
-                        p1_pool = p1_pool + pool
-                        print("You won! You currently have", end = " ") 
-                        print(p1_pool, end = " ")
-                        print("dollars") 
-                        folded = True
-                        break
-                    
+                    p1_pool, p2_pool, pool, folded = bet(p1_pool, p2_pool, pool, bet_val, y)
+                                  
 
                 elif action == "check":
                     # P2 will bet after P1 checks when  y > u or y < t 
-
-                    u = 0.797
-                    t = 0.131
-                    y = estimate_probability(p2_hand)
                     if y > u or y < t:
                         print("The opponent bets", end = " ")
                         print(p2_bet, end = " ")
@@ -540,11 +547,12 @@ def play_game():
                             print("You lost! You currently have", end = " ")
                             print(p1_pool, end = " ")
                             print("dollars")
-                            folded = True
-                            break
- 
+                            folded = True 
                     else:
                         print("The opponent checks!")
+                
+                if folded:
+                        break  
 
                 
                 print("List the cards you want to discard (no commas!):")
