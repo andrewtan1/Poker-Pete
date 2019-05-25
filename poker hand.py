@@ -448,7 +448,8 @@ def estimate_probability(hand):
             p = p + (4*(bin(i-1,4)*pow(4,4) - pow(4,4) - bin(i-1,4) + 1))/(bin(52,5))
         return p
 
-def bet(bal_p1, bal_p2, tot_pool, val, strength):
+# Game logic for Bet Choice
+def bet(bal_p1, bal_p2, tot_pool, val, strength, foldStat):
     bet_val = val    
     # P2 will call if y > n
     p1_pool = bal_p1
@@ -456,7 +457,7 @@ def bet(bal_p1, bal_p2, tot_pool, val, strength):
     pool = tot_pool
     n = 0.5   #TODO: Bet Threshold for Call; will change later
     y = strength
-    folded = False
+    folded = foldStat
     if y > n:
         print("The opponent calls!")
         p1_pool = p1_pool - bet_val
@@ -471,6 +472,43 @@ def bet(bal_p1, bal_p2, tot_pool, val, strength):
         print("dollars") 
         folded = True
     return p1_pool, p2_pool, pool, folded;
+
+def check(bal_p1, bal_p2, tot_pool, p2_val, strength, foldStat, validity):
+    u = 0.797   # Opponent Check/Raise Threshold 1
+    t = 0.131   # Opponent Check/Raise Threshold 2
+    p1_pool = bal_p1
+    p2_pool = bal_p2
+    pool = tot_pool
+    p2_bet = p2_val
+    y = strength
+    folded = foldStat
+    invalid = validity
+    if y > u or y < t:
+        print("The opponent bets", end = " ")
+        print(p2_bet, end = " ")
+        print("dollars!")
+
+        invalid = True
+        action = input("What would you like to do? [call/fold]:")
+        while invalid == True:
+            if action == "call" or action == "fold":
+                invalid = False
+            else:
+                action = input("Invalid action, try again. [call/fold]:")
+        if action == "call":
+            p1_pool = p1_pool - p2_bet
+            p2_pool = p2_pool - p2_bet
+            pool = pool + 2 * p2_bet
+        elif action == "fold":
+            print("You folded!")
+            p2_pool = p2_pool + pool
+            print("You lost! You currently have", end = " ")
+            print(p1_pool, end = " ")
+            print("dollars")
+            folded = True 
+    else:
+        print("The opponent checks!")
+    return p1_pool, p2_pool, pool, folded, invalid;
 
 # Simulate a game of poker (symmetric Neumann model)
 
@@ -525,41 +563,14 @@ def play_game():
                             print("Please enter a single number")   # Handle bad input
                         else:
                             notFloat = False
-                    p1_pool, p2_pool, pool, folded = bet(p1_pool, p2_pool, pool, bet_val, y)
-                                  
-
+                    p1_pool, p2_pool, pool, folded = bet(p1_pool, p2_pool, pool, bet_val, y, folded)
                 elif action == "check":
                     # P2 will bet after P1 checks when  y > u or y < t 
-                    if y > u or y < t:
-                        print("The opponent bets", end = " ")
-                        print(p2_bet, end = " ")
-                        print("dollars!")
-
-                        invalid = True
-                        action = input("What would you like to do? [call/fold]:")
-                        while invalid == True:
-                            if action == "call" or action == "fold":
-                                invalid = False
-                            else:
-                                action = input("Invalid action, try again. [call/fold]:")
-                        if action == "call":
-                            p1_pool = p1_pool - p2_bet
-                            p2_pool = p2_pool - p2_bet
-                            pool = pool + 2 * p2_bet
-                        elif action == "fold":
-                            print("You folded!")
-                            p2_pool = p2_pool + pool
-                            print("You lost! You currently have", end = " ")
-                            print(p1_pool, end = " ")
-                            print("dollars")
-                            folded = True 
-                    else:
-                        print("The opponent checks!")
+                    p1_pool, p2_pool, pool, folded, invalid = check(p1_pool, p2_pool, pool, p2_bet, y, folded, invalid)
                 
                 if folded:
                         break  
 
-                
                 print("List the cards you want to discard (no commas!):")
                 discard = list(map(int,input().split()))
                 for x in discard:
