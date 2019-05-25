@@ -459,10 +459,10 @@ def bet(bal_p1, bal_p2, tot_pool, val, strength):
     folded = False
     if y > n:
         print("The opponent calls!")
-        p1_pool = p1_pool - bet
-        pool = pool + bet
-        p2_pool = p2_pool - bet
-        pool = pool + bet
+        p1_pool = p1_pool - bet_val
+        pool = pool + bet_val
+        p2_pool = p2_pool - bet_val
+        pool = pool + bet_val
     else:
         print("The opponent folds!")
         p1_pool = p1_pool + pool
@@ -517,9 +517,14 @@ def play_game():
                 u = 0.797   # Opponent Check/Raise Threshold 1
                 t = 0.131   # Opponent Check/Raise Threshold 2
                 if action == "bet":
-                    bet_val = input("How much would you like to bet? ")
-                    bet_val = float(bet_val)
-                    
+                    notFloat = True
+                    while(notFloat):
+                        try:
+                            bet_val = float(input("How much would you like to bet? "))
+                        except ValueError:
+                            print("Please enter a single number")   # Handle bad input
+                        else:
+                            notFloat = False
                     p1_pool, p2_pool, pool, folded = bet(p1_pool, p2_pool, pool, bet_val, y)
                                   
 
