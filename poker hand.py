@@ -455,7 +455,7 @@ def bet(bal_p1, bal_p2, tot_pool, val, strength, foldStat):
     p1_pool = bal_p1
     p2_pool = bal_p2
     pool = tot_pool
-    n = 0.5   #TODO: Bet Threshold for Call; will change later
+    n = 0.5   #TODO: Bet Threshold for Call; MIGHT change later
     y = strength
     folded = foldStat
     if y > n:
@@ -536,7 +536,7 @@ def play_game():
 
             for i in range(num_rounds):
                 
-                # By default, player 2 will bet 20% (adjustable) of their current pool
+                # By default, player 2 will bet 3.62
                 p2_bet = 3.62
 
                 print("Your current hand is: ")
