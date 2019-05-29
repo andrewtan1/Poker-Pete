@@ -449,13 +449,17 @@ def estimate_probability(hand):
         return p
 
 # Game logic for Bet Choice
-def bet(bal_p1, bal_p2, tot_pool, val, strength, foldStat):
+def bet(bal_p1, bal_p2, tot_pool, val, strength, foldStat, mode):
     bet_val = val    
+    
     # P2 will call if y > n
     p1_pool = bal_p1
     p2_pool = bal_p2
     pool = tot_pool
-    n = 0.5   #TODO: Bet Threshold for Call; MIGHT change later
+    if mode == 1:
+        n = 0.5   #TODO: Bet Threshold for Call; MIGHT change later
+    elif mode == 2:
+        n = val/(val + 2)
     y = strength
     folded = foldStat
     if y > n:
@@ -465,11 +469,7 @@ def bet(bal_p1, bal_p2, tot_pool, val, strength, foldStat):
         p2_pool = p2_pool - bet_val
         pool = pool + bet_val
     else:
-        print("The opponent folds!")
-        p1_pool = p1_pool + pool
-        print("You won! You currently have", end = " ") 
-        print(p1_pool, end = " ")
-        print("dollars") 
+        p1_pool, p2_pool, pool = fold(p1_pool,p2_pool,pool,2) 
         folded = True
     return p1_pool, p2_pool, pool, folded;
 
@@ -500,24 +500,45 @@ def check(bal_p1, bal_p2, tot_pool, p2_val, strength, foldStat, validity):
             p2_pool = p2_pool - p2_bet
             pool = pool + 2 * p2_bet
         elif action == "fold":
-            print("You folded!")
-            p2_pool = p2_pool + pool
-            print("You lost! You currently have", end = " ")
-            print(p1_pool, end = " ")
-            print("dollars")
+            p1_pool, p2_pool, pool = fold(p1_pool,p2_pool,pool,1)
             folded = True 
     else:
         print("The opponent checks!")
     return p1_pool, p2_pool, pool, folded, invalid;
 
-# Simulate a game of poker (symmetric Neumann model)
+def fold(bal_p1, bal_p2, tot_pool, fold_player):
+    p1_pool = bal_p1
+    p2_pool = bal_p2
+    pool = tot_pool
+
+    if fold_player == 1:
+        print("You folded!")
+        p2_pool = p2_pool + pool
+        print("You lost! You currently have", end = " ")
+        print(p1_pool, end = " ")
+        print("dollars")
+
+    elif fold_player == 2:
+        print("The opponent folds!")
+        p1_pool = p1_pool + pool
+        print("You won! You currently have", end = " ") 
+        print(p1_pool, end = " ")
+        print("dollars")
+
+    return p1_pool, p2_pool, pool;
+
+
+# Simulate a game of poker (symmetric Neumann model
 
 def play_game():
+    
     play = True
     p1_pool = 100
     p2_pool = 100
     num_rounds = 2
     ante = 1
+    mode = 1 # 1 for symmetric Neumann model (P1 can bet/check), 2 for Borel model (P1 can bet/fold)
+
     
     while play == True and p1_pool > 0 and p2_pool > 0:
         winner = 0
@@ -525,6 +546,19 @@ def play_game():
 
         p = input("Play? [y/n]: ")
         if p == 'y' or p == 'Y' or p1_pool <= 0 or p2_pool <= 0:
+            
+            invalid = True
+            while(invalid):
+                try:
+                    mode = int(input("Which mode would you like to play? [1/2]: "))
+                    if mode == 1 or mode == 2:
+                        invalid = False
+                        break
+                    print("Please enter either 1 or 2.") 
+                except ValueError:
+                    print("Please enter either 1 or 2.")   # Handle bad input
+        
+
             p1_pool = p1_pool - ante
             p2_pool = p2_pool - ante
             pool = 2 * ante
@@ -543,12 +577,21 @@ def play_game():
                 print(p1_hand)
                 read_hand(p1_hand)
                 invalid = True
-                action = input("What would you like to do? [bet/check]:")
+
+                if mode == 1:
+                    action = input("What would you like to do? [bet/check]:")
+                else:
+                    action = input("What would you like to do? [bet/fold]:")
+
+                
                 while invalid == True:
-                    if action == "bet" or action == "check":
+                    if action == "bet" or (action == "check" and mode == 1) or (action == "fold" and mode == 2):
                         invalid = False
                     else:
-                        action = input("Invalid action, try again. [bet/check]:")
+                        if mode == 1:
+                            action = input("Invalid action. Try again. [bet/check]:")
+                        else:
+                            action = input("Invalid action. Try again. [bet/fold]:")
                 #Get P2's hands' relative strength to make a decision 
                 y = estimate_probability(p2_hand)
                 
@@ -563,10 +606,14 @@ def play_game():
                             print("Please enter a single number")   # Handle bad input
                         else:
                             notFloat = False
-                    p1_pool, p2_pool, pool, folded = bet(p1_pool, p2_pool, pool, bet_val, y, folded)
+                    #TODO: should take mode as argument
+                    p1_pool, p2_pool, pool, folded = bet(p1_pool, p2_pool, pool, bet_val, y, folded, mode)
                 elif action == "check":
                     # P2 will bet after P1 checks when  y > u or y < t 
                     p1_pool, p2_pool, pool, folded, invalid = check(p1_pool, p2_pool, pool, p2_bet, y, folded, invalid)
+                elif action == "fold":
+                    p1_pool, p2_pool, pool = fold(p1_pool,p2_pool,pool,1)
+                    folded = True 
                 
                 if folded:
                         break  
