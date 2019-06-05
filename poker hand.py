@@ -533,6 +533,20 @@ def fold(bal_p1, bal_p2, tot_pool, fold_player):
 def play_game():
     
     play = True
+    # play_as is a parameter that tells us whether human player is playing P1/P2
+    invalid = True
+    play_as = 1
+    while(invalid):
+        try:
+            play_as = int(input("Which player are you playing as? [1/2]: "))
+            if play_as == 1 or play_as == 2:
+                invalid = False
+                break
+            print("Please enter either 1 or 2.") 
+        except ValueError:
+            print("Please enter either 1 or 2.")   # Handle bad input
+
+   
     p1_pool = 100
     p2_pool = 100
     num_rounds = 2
@@ -543,7 +557,7 @@ def play_game():
     while play == True and p1_pool > 0 and p2_pool > 0:
         winner = 0
         folded = False
-
+        
         p = input("Play? [y/n]: ")
         if p == 'y' or p == 'Y' or p1_pool <= 0 or p2_pool <= 0:
             
@@ -568,78 +582,223 @@ def play_game():
             p1_hand = start[0:5]
             p2_hand = start[5:10]
 
-            for i in range(num_rounds):
-                
-                # By default, player 2 will bet 3.62
-                p2_bet = 3.62
+            if play_as == 1:
+                for i in range(num_rounds):
+                    
+                    # By default, player 2 will bet 3.62
+                    p2_bet = 3.62
 
-                print("Your current hand is: ")
-                print(p1_hand)
-                read_hand(p1_hand)
-                invalid = True
+                    print("Your current hand is: ")
+                    print(p1_hand)
+                    read_hand(p1_hand)
+                    invalid = True
 
-                if mode == 1:
-                    action = input("What would you like to do? [bet/check]:")
-                else:
-                    action = input("What would you like to do? [bet/fold]:")
-
-                
-                while invalid == True:
-                    if action == "bet" or (action == "check" and mode == 1) or (action == "fold" and mode == 2):
-                        invalid = False
+                    if mode == 1:
+                        action = input("What would you like to do? [bet/check]:")
                     else:
-                        if mode == 1:
-                            action = input("Invalid action. Try again. [bet/check]:")
-                        else:
-                            action = input("Invalid action. Try again. [bet/fold]:")
-                #Get P2's hands' relative strength to make a decision 
-                y = estimate_probability(p2_hand)
-                
-                u = 0.797   # Opponent Check/Raise Threshold 1
-                t = 0.131   # Opponent Check/Raise Threshold 2
-                if action == "bet":
-                    notFloat = True
-                    while(notFloat):
-                        try:
-                            bet_val = float(input("How much would you like to bet? "))
-                        except ValueError:
-                            print("Please enter a single number")   # Handle bad input
-                        else:
-                            notFloat = False
-                    #TODO: should take mode as argument
-                    p1_pool, p2_pool, pool, folded = bet(p1_pool, p2_pool, pool, bet_val, y, folded, mode)
-                elif action == "check":
-                    # P2 will bet after P1 checks when  y > u or y < t 
-                    p1_pool, p2_pool, pool, folded, invalid = check(p1_pool, p2_pool, pool, p2_bet, y, folded, invalid)
-                elif action == "fold":
-                    p1_pool, p2_pool, pool = fold(p1_pool,p2_pool,pool,1)
-                    folded = True 
-                
-                if folded:
-                        break  
+                        action = input("What would you like to do? [bet/fold]:")
 
-                print("List the cards you want to discard (no commas!):")
-                discard = list(map(int,input().split()))
-                for x in discard:
-                    redundant = True
-                    while redundant == True:
-                        new_card = random.randint(0,51)
-                        if np.any(used[:] == new_card) == False:
-                            redundant = False
-                            used = np.append(used, new_card)
-                            p1_hand[x-1] = new_card
-                            
+                    
+                    while invalid == True:
+                        if action == "bet" or (action == "check" and mode == 1) or (action == "fold" and mode == 2):
+                            invalid = False
+                        else:
+                            if mode == 1:
+                                action = input("Invalid action. Try again. [bet/check]:")
+                            else:
+                                action = input("Invalid action. Try again. [bet/fold]:")
+                    #Get P2's hands' relative strength to make a decision 
+                    y = estimate_probability(p2_hand)
+                    
+                    u = 0.797   # Opponent Check/Raise Threshold 1
+                    t = 0.131   # Opponent Check/Raise Threshold 2
+                    if action == "bet":
+                        notFloat = True
+                        while(notFloat):
+                            try:
+                                bet_val = float(input("How much would you like to bet? "))
+                            except ValueError:
+                                print("Please enter a single number")   # Handle bad input
+                            else:
+                                notFloat = False
+                        #TODO: should take mode as argument
+                        p1_pool, p2_pool, pool, folded = bet(p1_pool, p2_pool, pool, bet_val, y, folded, mode)
+                    elif action == "check":
+                        # P2 will bet after P1 checks when  y > u or y < t 
+                        p1_pool, p2_pool, pool, folded, invalid = check(p1_pool, p2_pool, pool, p2_bet, y, folded, invalid)
+                    elif action == "fold":
+                        p1_pool, p2_pool, pool = fold(p1_pool,p2_pool,pool,1)
+                        folded = True 
+                    
+                    if folded:
+                            break  
+
+                    print("List the cards you want to discard (no commas!):")
+                    discard = list(map(int,input().split()))
+                    for x in discard:
+                        redundant = True
+                        while redundant == True:
+                            new_card = random.randint(0,51)
+                            if np.any(used[:] == new_card) == False:
+                                redundant = False
+                                used = np.append(used, new_card)
+                                p1_hand[x-1] = new_card
+                                
+                    
+                    p2_discard  = recommend_move(p2_hand)
+                    for x in p2_discard:
+                        redundant = True
+                        while redundant == True:
+                            new_card = random.randint(0,51)
+                            if np.any(used[:] == new_card) == False:
+                                redundant = False
+                                used = np.append(used, new_card)
+                                p2_hand[x-1] = new_card
+
+                               
+            elif play_as == 2:
+                #TODO: FIX EVERYTHING
+                # Here, the AI is Player 1
+                for i in range(num_rounds):
                 
-                p2_discard  = recommend_move(p2_hand)
-                for x in p2_discard:
-                    redundant = True
-                    while redundant == True:
-                        new_card = random.randint(0,51)
-                        if np.any(used[:] == new_card) == False:
-                            redundant = False
-                            used = np.append(used, new_card)
-                            p2_hand[x-1] = new_card
-                            
+                    print("Your current hand is: ")
+                    print(p2_hand)
+                    read_hand(p2_hand)
+                    invalid = True
+
+                    # Bet/check: AI betting range is x > 0.942, x < 0.044
+                    # Bet/fold: AI betting range is x > c^2, for c = B/(B+2), where we set B = 0.1* P1's money
+                    
+                    m = 0.942 
+                    r = 0.044
+                   
+                    p1_bet = round(0.1 * p1_pool)
+                    c = p1_bet/(p1_bet + 2.0000)
+                    p1_action = " "
+                    x = estimate_probability(p1_hand)
+                    
+                    if mode == 1:
+
+                        if x > m or x < r:
+                            # 6.275 is fixed amount derived from the paper
+                            bet = 6.275
+                            p1_action = "bet"
+                            p1_pool = p1_pool - p1_bet
+                            pool = pool + p1_bet
+                            print("The opponent bets", end = " ")
+                            print(p1_bet, end = " ")
+                            print("dollars!")
+
+                        else: 
+                            p1_action = "check"
+                            print("The opponent checks!")
+    
+
+                    elif mode == 2: 
+                        if y > c*c:
+                            p1_action = "bet"
+                            p1_pool = p1_pool - p1_bet
+                            pool = pool + p1_bet
+                            print("The opponent bets", end = " ")
+                            print(p1_bet, end = " ")
+                            print("dollars!")
+                        else:
+                            p1_action = "fold"
+                            folded = True
+                            print("The opponent folds!")
+                            p2_pool = p2_pool + pool
+                            print("You won! You currently have", end = " ") 
+                            print(p2_pool, end = " ")
+                            print("dollars")
+                            break
+
+
+                    action = " "
+                    invalid = True
+
+
+                    if p1_action == "bet":
+                        print("What would you like to do? [call/fold]:")
+                        while invalid == True:
+                            if action == "call" or action == "fold":
+                                invalid = False
+                            else:
+                                action = input("Invalid action. Try again. [call/fold]:")
+
+                        if action == "call":
+                            p2_pool = p2_pool - p1_bet
+                            pool = pool + p1_bet
+                        if action == "fold":
+                            folded = True
+                            print("You folded!")
+                            p1_pool = p1_pool + pool
+                            print("You lost! You currently have", end = " ")
+                            print(p2_pool, end = " ")
+                            print("dollars")
+                            break
+
+                        
+                    elif p1_action == "check":
+                        print("What would you like to do? [bet/check]: ")
+                        while invalid == True:
+                            if action == "bet" or action == "check":
+                                invalid = False
+                            else:
+                                action = input("Invalid action. Try again. [bet/check]:")
+                        if action == "bet":
+                            p2_bet = 0
+                            notFloat = True
+                            while(notFloat):
+                                try:
+                                    p2_bet = float(input("How much would you like to bet? "))
+                                except ValueError:
+                                    print("Please enter a single number")   # Handle bad input
+                                else:
+                                    notFloat = False
+
+                            p2_pool = p2_pool - p2_bet
+                            pool = pool + p2_bet
+                            if x > 0.5:
+                                print("The opponent calls!")
+                                p1_pool = p1_pool - p2_bet
+                                pool = pool + p2_bet
+                            else:
+                                print("The opponent folds!")
+                                folded = True
+                                p2_pool = p2_pool + pool
+                                print("You won! You currently have", end = " ") 
+                                print(p2_pool, end = " ")
+                                print("dollars")
+                                break
+                                   
+   
+
+                    if folded:
+                            break  
+
+
+                    print("List the cards you want to discard (no commas!):")
+                    discard = list(map(int,input().split()))
+                    for x in discard:
+                        redundant = True
+                        while redundant == True:
+                            new_card = random.randint(0,51)
+                            if np.any(used[:] == new_card) == False:
+                                redundant = False
+                                used = np.append(used, new_card)
+                                p1_hand[x-1] = new_card
+                                
+                    
+                    p2_discard  = recommend_move(p2_hand)
+                    for x in p2_discard:
+                        redundant = True
+                        while redundant == True:
+                            new_card = random.randint(0,51)
+                            if np.any(used[:] == new_card) == False:
+                                redundant = False
+                                used = np.append(used, new_card)
+                                p2_hand[x-1] = new_card
+
 
 
             if folded == False:
